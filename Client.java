@@ -32,7 +32,9 @@ public class Client extends Message{
                 //print out message 
                 String from = msg.optString("from");
                 String text = msg.optString("text");
-                System.out.println(from + ": " + text);
+                String date = msg.optString("date");
+
+                System.out.println(date + " " + from + ": " + text);
                 break;
             default:
                 System.out.println("Unknown message received");

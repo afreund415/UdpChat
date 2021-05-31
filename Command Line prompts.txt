@@ -25,3 +25,23 @@ NAT + protocol discussion in readme
 
 
 TESTING GIT
+
+git config --global --edit (for getting rid of username stuff)
+
+git add --all 
+
+git commit -m "message"
+
+git push
+
+
+
+Next steps: 
+    1. multiworded chat 
+    2. clean up naming conventions/debug code/commented code 
+    3. readme [NAT, sendThread, commandline]
+    4. Testfile 
+    5. makefile 
+    6. add in success messages 
+    7. Put on VM 
+    8. test with multiple clients

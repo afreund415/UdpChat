@@ -1,7 +1,11 @@
 
-import java.net.*;  
+import java.net.*;
+import java.text.SimpleDateFormat;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
+
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -59,12 +63,17 @@ public abstract class Message{
      
         //unique ID for ensuring correct sending of messages
         String id = UUID.randomUUID().toString();
+        Date date = new Date();
         
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+
         //adding necessary fields to message obj
         m.put("id", id);
         m.put("addr", addr);
         m.put("port", port);
         m.put("type", type);
+        m.put("date", formatter.format(date));
 
         //add message to queue
         messageQueue.put(m);
