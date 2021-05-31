@@ -22,3 +22,6 @@ file
 
 
 NAT + protocol discussion in readme
+
+
+TESTING GIT
