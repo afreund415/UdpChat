@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch UdpChat",
+            "request": "launch",
+            "mainClass": "UdpChat",
+            "projectName": "UdpChat_cfb3bf42",
+            "args": "-s 3000 -c dre 127.0.0.1 3000 3001"
+        },
+        {
+            "type": "java",
+            "name": "Launch DReceiver",
+            "request": "launch",
+            "mainClass": "DReceiver"
+        },
+        {
+            "type": "java",
+            "name": "Launch DSender",
+            "request": "launch",
+            "mainClass": "DSender"
+        }
+    ]
+}

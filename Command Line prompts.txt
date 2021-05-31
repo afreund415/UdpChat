@@ -1,0 +1,24 @@
+Command Line prompts: 
+
+Connecting to vm (external ip may change): 
+ssh -i  ~/.ssh/id_rsa andreasfreund@35.245.199.86 
+ssh -i  ~/.ssh/id_rsa andreasfreund@35.199.16.29
+
+
+$ UdpChat <mode> <command-line arguments> : 
+Start the program for server or client, 
+(for example : UdpChat -c for client and UdpChat -s for server). 
+The server mode takes one argument, its listening port. 
+The client mode should take four arguments: the client’s nick-name, 
+the server ip address, the server’s listening port number, and this 
+client’s port number for listening.
+
+java UdpChat.java -s 3000 -c dre localhost 3000 3000
+
+Dynamic arrays 
+hash map implementation
+json/hashmap parsers 
+file
+
+
+NAT + protocol discussion in readme
