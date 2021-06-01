@@ -13,7 +13,8 @@ public class UdpChat {
 
     public static void main(String[] args) {
         argParse(args);
-        
+       
+        //**delete start
         //message testing code
         // for (int i = 0; i < 10; i++){
         //     JSONObject message = new JSONObject();
@@ -22,6 +23,9 @@ public class UdpChat {
         //     client.sendMessage(message, client.sAddr, client.sPort, "chat");
             
         // }
+        //delete end**
+
+        //**scanner for taking args argument while running**
         Scanner input = new Scanner(System.in);
         while (running){
 
@@ -33,26 +37,25 @@ public class UdpChat {
         }
         input.close();
 
+        //stop methods for server + client
         if (client != null){
             client.stop();
         }
 
         if (server !=null){
             server.stop();
-        }
-        
+        }      
     }
 
     //method for detecting commandline args 
     private static void argParse(String[] args){
-
         int pos = 0;
-        //try and catch errors here
 
         try{
 
-            while (pos < args.length){
-
+            //switch method for processing CL args
+            //**changed to while equal DELETE**
+            while (pos <= args.length){
                 
                 switch(args[pos].toLowerCase()) {
                     //client commandline case
@@ -82,7 +85,7 @@ public class UdpChat {
                         server = new Server(Integer.parseInt(args[++pos]));
                         
                         break;
-                    //send <name> <message>.
+                    //send case
                     case "send":
                         if ((args.length - pos <= 2)){
                             errorHandler("To send a message, include the " +
@@ -94,6 +97,7 @@ public class UdpChat {
                             errorHandler("Instance is not running in client mode");
                             return;
                         }
+                        //creating message
                         String name = args[++pos].toLowerCase();
                         JSONObject user = client.findUser(name);
                         JSONObject msgChat = new JSONObject();
@@ -109,9 +113,6 @@ public class UdpChat {
                             client.sendMessage(msgChat, client.sAddr, client.sPort, "chat");
                         }
                         break;
-                        //1. look up name a. if no match, return error
-                        //2. user offline, send message to server for storage 
-                        //3. if user online, send message to user 
                         
                     //quit commandline case
                     case "-q":

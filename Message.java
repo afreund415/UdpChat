@@ -1,10 +1,8 @@
 
 import java.net.*;
 import java.text.SimpleDateFormat;
-
 import org.json.JSONObject;
 import org.json.JSONArray;
-
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
@@ -19,6 +17,7 @@ public abstract class Message{
     boolean running = true;
     DatagramSocket ds;
     JSONArray messageQueue = new JSONArray();
+    //**remove tag eventually */
     String tag;
     JSONObject clientTable = new JSONObject(); 
     
@@ -26,7 +25,7 @@ public abstract class Message{
     //constructor method for classes 
     public Message(int port, String tag) throws Exception{
         this.port = port;
-        //tag for debugging thread handling
+        //**tag for debugging thread handling*
         this.tag = tag;
         send = new Send();
         receive = new Receive();
@@ -41,6 +40,7 @@ public abstract class Message{
     }
 
     //stop thread helper method
+    //makes sure to allow send & receive threads to finish
     public void stop(){
         running = false;
         while(send.isAlive() && receive.isAlive()){
@@ -49,7 +49,7 @@ public abstract class Message{
         ds.close();
     }
 
-    //timne delay helper method
+    //time delay helper method
     public void sleepMs(int i){
         try{
             Thread.sleep(i);
@@ -64,9 +64,7 @@ public abstract class Message{
         //unique ID for ensuring correct sending of messages
         String id = UUID.randomUUID().toString();
         Date date = new Date();
-        
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
 
         //adding necessary fields to message obj
         m.put("id", id);
@@ -85,7 +83,7 @@ public abstract class Message{
         try{
             InetAddress ip; 
 
-            //ensuring ACKs are not sent in response to other ACKs    
+            //**ensuring ACKs are not sent in response to other ACKs    
             //may not be necessary since we check in receive thread*
             if (m.getString("type").equals("ack")){
                 return;
@@ -111,7 +109,7 @@ public abstract class Message{
             DatagramPacket dp = new DatagramPacket(str.getBytes(), 
                                     str.length(), ip, p);
             //send ACK (no delay)
-            //SHOULD I MAKE MULTIPLE ATTEMPTS?
+            //**SHOULD I MAKE MULTIPLE ATTEMPTS?*
             ds.send(dp);
         }
         catch(Exception e){
@@ -122,18 +120,17 @@ public abstract class Message{
     //receive message (abstract for server + client overload)
     abstract void recvMsg(JSONObject msg, String addr, int port);
     
-    //send chat message (abstract)
+    //send chat fail message (abstract)
     abstract void sendFail(JSONObject msg, String addr, int port);
 
-    //user lookup
-
+    //user lookup w/ string
     public JSONObject findUser(String name){
         JSONObject user = clientTable.optJSONObject(name);
 
         return user;
 
     }
-
+    //user lookkup w/ JSON obj
     public JSONObject findUser(JSONObject msg){
         String name = msg.optString("name");
 
@@ -142,7 +139,6 @@ public abstract class Message{
     }
 
     //send thread 
-
     class Send extends Thread{
 
         public void run(){
@@ -157,7 +153,7 @@ public abstract class Message{
                         JSONObject message = messageQueue.getJSONObject(0);
 
                         if (message != null){
-                            //create string from JSON Obj msg
+                            //**create debug string from JSON Obj msg*
                             String str = message.toString();
                             //getting destination address + port
                             String addr = message.getString("addr");
@@ -207,16 +203,14 @@ public abstract class Message{
             System.out.println("Send Thread stopped " + tag);
 
         } 
-
     }
 
     //Receive thread
 
     class Receive extends Thread{
 
-
         public void run(){
-            //debug statement
+            //**debug statement*
             System.out.println("Receive Thread started " + tag);
             //set max # of bytes receiver can receive (max)
             byte[] buf = new byte[1024]; 
@@ -236,7 +230,7 @@ public abstract class Message{
                         String str = new String(dp.getData(), 0, dp.getLength());  
                         JSONObject message = new JSONObject(str);
 
-                        //prints out msg...debug should be removed 
+                        //**prints out msg...debug should be removed *
                         System.out.println(tag + ": " + str);  
                         
                         //if system receives ACK, checks to see if unique 

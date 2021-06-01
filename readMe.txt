@@ -75,3 +75,6 @@ msgTable{
 1. Send messages (commandline)
 2. Send messages to other clients 
 3. Storing offline messages on server
+
+
+Git token: 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

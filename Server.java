@@ -63,6 +63,8 @@ public class Server extends Message{
                 //helper method for broadcasting updated table 
                 //to all online users
                 updateClients();
+
+                //check for offline messages
                 userMsgs = offlineMsgs.optJSONArray(name);
 
                 if (userMsgs!=null){
@@ -111,8 +113,4 @@ public class Server extends Message{
         }
     }
 
-    //needs to create JSON table and maintain it for all users 
-    //needs to broadcast table to all users based on changes in online status 
-
-    
 }
