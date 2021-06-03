@@ -58,8 +58,22 @@ public abstract class Message{
         }
     }
 
+    //maybe delete
+    synchronized public JSONObject findMessage(String id){
+        JSONObject msg = null; 
+
+        for (int i = 0; i < messageQueue.length(); i++){
+            msg = messageQueue.optJSONObject(i);
+            if (msg != null && msg.getString("id").equals(id)){
+                return msg;
+            }
+        }
+        
+        return null;
+    }
+
     //message creator method that adds messages to JSON queue 
-    public void sendMessage(JSONObject m, String addr, int port, String type){
+    synchronized public void sendMessage(JSONObject m, String addr, int port, String type){
      
         //unique ID for ensuring correct sending of messages
         String id = UUID.randomUUID().toString();
@@ -78,7 +92,7 @@ public abstract class Message{
     }
 
     //ACK method for ensuring successful delivery
-    public void sendACK(JSONObject m, String addr, int port){
+    synchronized public void sendACK(JSONObject m, String addr, int port){
         
         try{
             InetAddress ip; 
@@ -114,7 +128,23 @@ public abstract class Message{
         }
         catch(Exception e){
             printError(e.getMessage());
+        }   
+    }
+    
+    synchronized public void recvACK(JSONObject msgAck, String addr, int port){
+        
+        String ackId = msgAck.getString("id");
+                            
+        JSONObject msg = findMessage(ackId);
+
+        //if ids match, sent msg type ACK to true
+        //this enables sender to remove msg from queue
+        if (msg != null && msg.getString("id").equals(ackId)){
+            msg.put("ack", true);
         }
+        else{
+            printDebug(msgAck + " not found");
+        }        
     }
 
     //receive message (abstract for server + client overload)
@@ -128,7 +158,6 @@ public abstract class Message{
         JSONObject user = clientTable.optJSONObject(name);
 
         return user;
-
     }
     //user lookkup w/ JSON obj
     public JSONObject findUser(JSONObject msg){
@@ -150,7 +179,7 @@ public abstract class Message{
                 try{
                     if (!(messageQueue.isEmpty())){
                         //sets message to first message in queue
-                        JSONObject message = messageQueue.getJSONObject(0);
+                        JSONObject message = messageQueue.optJSONObject(0);
 
                         if (message != null){
                             //**create debug string from JSON Obj msg*
@@ -236,21 +265,9 @@ public abstract class Message{
                         //if system receives ACK, checks to see if unique 
                         //ids are the same on ACK and message 
                         if (message.getString("type").equals("ack")){
-                            String ackId = message.getString("id");
-                            
-                            JSONObject m = messageQueue.optJSONObject(0);
-
-                            //if ids match, sent msg type ACK to true
-                            //this enables sender to remove msg from queue
-                            if (m !=null && m.getString("id").equals(ackId)){
-                                m.put("ack", true);
-                            }
+                            recvACK(message, addr, p);
                         }
                         else{
-                            //ACK testing method REMOVE
-                            // if (Math.random() < 0.5){ 
-                            //     continue;
-                            // }
                             //call send ACK with msg, addr, and port 
                             sendACK(message, addr, p);
                             recvMsg(message, addr, p);

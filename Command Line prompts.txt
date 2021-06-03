@@ -34,7 +34,8 @@ git commit -m "message"
 
 git push
 
-
+to swithc to root: 
+>>> su
 
 Next steps: 
     1. multiworded chat 

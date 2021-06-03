@@ -94,18 +94,20 @@ public class Server extends Message{
     private void updateClients(){
         //users are case-agnostic (see recvMessg)
         JSONArray users = clientTable.names();
-        JSONObject msgTable = new JSONObject();
-        //adds reference to clientTable to msgTables
-        msgTable.put("table", clientTable); 
+       
 
         //loop for sending updated table to online users
         for (int i = 0; i < users.length(); i++){
+            JSONObject msgTable = new JSONObject();
+            //adds reference to clientTable to msgTables
+            msgTable.put("table", clientTable); 
             String user = users.getString(i);
             JSONObject dest = clientTable.getJSONObject(user);
             
             
             if(dest.optBoolean("online")){
                 //sends updated table to each online user    
+                printDebug("updateClients " + user + " " + dest.toString());
                 sendMessage(msgTable, dest.getString("addr"),
                             dest.getInt("port"), "table");
             }

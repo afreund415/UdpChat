@@ -14,3 +14,17 @@ Clarification:
 KNown issues: 
 send Andreas hello 
 
+
+
+Plan 6/3
+1. Bug fixing 
+2. Deploy to google box
+3. Double check of all specs  
+4. Code review of all files 
+    a. Keep note of topics for readme
+    b. naming conventions 
+
+
+Things to address: 
+    1. Let user know more clearly which users are online (ie return the list of online users)
+    2. 
