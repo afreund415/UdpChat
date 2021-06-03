@@ -17,6 +17,7 @@
             "mainClass": "UdpChat",
             "projectName": "UdpChat_cfb3bf42",
             "args": "-s 3000 -c dre 127.0.0.1 3000 3001"
+            //Andreas 127.0.0.1 3000 3002
         },
         {
             "type": "java",

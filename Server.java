@@ -87,7 +87,7 @@ public class Server extends Message{
                 storeChatOffline(msg);
                 break;
             default:
-                System.out.println("Unknown message received");
+                printError("Unknown message received");
         }
     }
 
@@ -95,7 +95,7 @@ public class Server extends Message{
         //users are case-agnostic (see recvMessg)
         JSONArray users = clientTable.names();
         JSONObject msgTable = new JSONObject();
-        //adds reference to clientTable to msgTable
+        //adds reference to clientTable to msgTables
         msgTable.put("table", clientTable); 
 
         //loop for sending updated table to online users

@@ -113,7 +113,7 @@ public abstract class Message{
             ds.send(dp);
         }
         catch(Exception e){
-            System.out.print(e);
+            printError(e.getMessage());
         }
     }
 
@@ -143,7 +143,7 @@ public abstract class Message{
 
         public void run(){
             //debug statement
-            System.out.println("Send Thread started " + tag);
+            printDebug("Send Thread started " + tag);
             InetAddress ip; 
             
             while(running || messageQueue.length() > 0){
@@ -176,7 +176,7 @@ public abstract class Message{
                                 }
                                 //alert user that system is attempting resend
                                 else { 
-                                    System.out.println("resending");
+                                    printMessage("resending");
                                 }
                                 count++;
                             }
@@ -184,7 +184,7 @@ public abstract class Message{
                             messageQueue.remove(0);
                             //if msg failed to send, alert user
                             if (count == 5){
-                                System.out.println("No ACK received after " +
+                                printMessage("No ACK received after " +
                                                     "timeout and 5 retries");
                                 sendFail(message, addr, p);
                             }
@@ -193,14 +193,14 @@ public abstract class Message{
                 }
                 
                 catch(Exception e){
-                    System.out.println(e);
+                    printError(e.getMessage());
                 }
                 //10ms timeout to wait for receiver thread*
                 sleepMs(10);
 
             }
             //debug statement
-            System.out.println("Send Thread stopped " + tag);
+            printDebug("Send Thread stopped " + tag);
 
         } 
     }
@@ -211,7 +211,7 @@ public abstract class Message{
 
         public void run(){
             //**debug statement*
-            System.out.println("Receive Thread started " + tag);
+            printDebug("Receive Thread started " + tag);
             //set max # of bytes receiver can receive (max)
             byte[] buf = new byte[1024]; 
             
@@ -231,7 +231,7 @@ public abstract class Message{
                         JSONObject message = new JSONObject(str);
 
                         //**prints out msg...debug should be removed *
-                        System.out.println(tag + ": " + str);  
+                        printDebug(tag + ": " + str);  
                         
                         //if system receives ACK, checks to see if unique 
                         //ids are the same on ACK and message 
@@ -260,11 +260,25 @@ public abstract class Message{
                 catch(SocketTimeoutException e){
                 }
                 catch(Exception e){
-                    System.out.println(e);
+                    printError(e.getMessage());
                 }
             }
             //debug statement
-            System.out.println("Receive Thread stopped " + tag);
+            printDebug("Receive Thread stopped " + tag);
         } 
+    }
+
+
+    public static void printMessage(String s){
+        System.out.println(s);
+        System.out.print(">>> ");
+    }
+
+    public static void printError(String s){
+        printMessage("Error " + s);
+    }
+
+    public static void printDebug(String s){
+        printMessage("Log: " + s);
     }
 }

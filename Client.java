@@ -18,7 +18,7 @@ public class Client extends Message{
         JSONObject msgReg = new JSONObject();
         msgReg.put("name", uName);
         sendMessage(msgReg, sAddr, sPort, "reg");
-        System.out.println("Welcome, You are registered");
+        printMessage("Welcome, You are registered");
     }
 
     public void recvMsg(JSONObject msg, String addr, int port){
@@ -34,10 +34,10 @@ public class Client extends Message{
                 String text = msg.optString("text");
                 String date = msg.optString("date");
 
-                System.out.println(date + " " + from + ": " + text);
+                printMessage(date + " " + from + ": " + text);
                 break;
             default:
-                System.out.println("Unknown message received");
+                printError("Unknown message received");
         }
     }
 
@@ -61,7 +61,7 @@ public class Client extends Message{
         JSONObject msgDereg = new JSONObject();
         msgDereg.put("name", uName);
         sendMessage(msgDereg, sAddr, sPort, "dereg");
-        System.out.println(uName + " deregistered");
+        printMessage(uName + " deregistered");
         //shut down sequence not correct. Can't just shut down without server ack
         super.stop();
     }

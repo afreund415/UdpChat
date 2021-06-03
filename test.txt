@@ -1,0 +1,16 @@
+A details:
+-Users cannot have same user name
+-
+
+
+Messages: 
+
+
+Clarification: 
+1. Dereg (why does it require a nickname/user name when the cleint already knows own name)
+2. Ack for dereg is weird. 
+
+
+KNown issues: 
+send Andreas hello 
+
