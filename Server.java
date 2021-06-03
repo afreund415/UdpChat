@@ -52,12 +52,22 @@ public class Server extends Message{
 
         switch(type){
             case "reg":
+                name = msg.getString("name").toLowerCase(); 
+                JSONObject user = findUser(name);
+
+                if (user != null && user.optBoolean("online")){
+                    JSONObject msgRegError = new JSONObject();
+                    msgRegError.put("text", name + " username is taken");
+                   
+                    sendMessage(msgRegError, addr, port, "regerror");
+                    return;
+                }
                 //adds addr, port, and online status to msg
                 msg.put("addr", addr);
                 msg.put("port", port);
                 msg.put("online", true);
                 //creates case-agnostic key for clientTable
-                name = msg.getString("name").toLowerCase();
+                
                 //adds key(by name) to table and contact info
                 clientTable.put(name, msg); 
                 //helper method for broadcasting updated table 

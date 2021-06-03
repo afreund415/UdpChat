@@ -113,7 +113,7 @@ public class UdpChat {
                         }
 
                         else{
-                            chatLine = line.substring(line.indexOf(name) + name.length() + 1);
+                            chatLine = line.substring(line.indexOf(args[pos]) + name.length() + 1);
                             pos = args.length;
                         }
 

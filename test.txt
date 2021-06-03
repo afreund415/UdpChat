@@ -27,4 +27,8 @@ Plan 6/3
 
 Things to address: 
     1. Let user know more clearly which users are online (ie return the list of online users)
-    2. 
+    2. dreas typo when having multiple clients talking to each other
+    3. check username duplicates
+    4. send table more cleanly 
+    5. Error Socket closed on dereg 
+     

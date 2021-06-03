@@ -7,6 +7,7 @@ public class Client extends Message{
     String uName;
     String sAddr;
     int sPort;
+    boolean userTableShown = false;
    
     //sendMessage(JSONObject m, String addr, int port, String type){
     //UdpChat -c <nick-name> <server-ip> <server-port> <client-port>
@@ -18,7 +19,7 @@ public class Client extends Message{
         JSONObject msgReg = new JSONObject();
         msgReg.put("name", uName);
         sendMessage(msgReg, sAddr, sPort, "reg");
-        printMessage("Welcome, You are registered");
+        printMessage("Welcome " + uName + "! You are registered");
     }
 
     public void recvMsg(JSONObject msg, String addr, int port){
@@ -27,6 +28,18 @@ public class Client extends Message{
         switch(type){
             case "table":
                 clientTable = msg.getJSONObject("table");
+                JSONArray users = clientTable.names();
+                //loop for sending updated table to online users
+                if (!userTableShown){
+                    for (int i = 0; i < users.length(); i++){
+                    
+                        JSONObject user = clientTable.optJSONObject(users.getString(i));
+                        if (user != null && !user.optString("name").equals(uName.toLowerCase())){
+                            printMessage(user.optString("name") + " is online");
+                        }
+                    }
+                }
+                
                 break;
             case "chat":
                 //print out message 
@@ -35,6 +48,10 @@ public class Client extends Message{
                 String date = msg.optString("date");
 
                 printMessage(date + " " + from + ": " + text);
+                break;
+            case "regerror":
+                printMessage(msg.optString("text"));
+                super.stop();
                 break;
             default:
                 printError("Unknown message received");
@@ -62,7 +79,6 @@ public class Client extends Message{
         msgDereg.put("name", uName);
         sendMessage(msgDereg, sAddr, sPort, "dereg");
         printMessage(uName + " deregistered");
-        //shut down sequence not correct. Can't just shut down without server ack
         super.stop();
     }
 

@@ -31,7 +31,7 @@ public abstract class Message{
         receive = new Receive();
         //shared socket and sending and receiving on same port
         ds = new DatagramSocket(port);
-        //allows receive thread to 
+        //allows receive thread to breath
         ds.setSoTimeout(500);
 
         //starting threads
@@ -46,7 +46,11 @@ public abstract class Message{
         while(send.isAlive() && receive.isAlive()){
             sleepMs(100);
         }
-        ds.close();
+
+        try{
+            ds.close();
+        }
+        catch(Exception e){};
     }
 
     //time delay helper method
@@ -296,6 +300,6 @@ public abstract class Message{
     }
 
     public static void printDebug(String s){
-        printMessage("Log: " + s);
+        //printMessage("Log: " + s);
     }
 }
