@@ -22,6 +22,8 @@ public abstract class Message{
     Send send; 
     Receive receive; 
     boolean running = true;
+    static boolean stopApp = false;
+    static boolean debug = false;
     DatagramSocket ds;
     JSONArray messageQueue = new JSONArray();
     //tag for debugging threads
@@ -47,7 +49,7 @@ public abstract class Message{
     }
 
     //stop thread helper method
-    public void stop(){
+    public void stopMessages(){
         running = false;
         //makes sure to allow send & receive threads to finish
         while(send.isAlive() && receive.isAlive()){
@@ -138,21 +140,8 @@ public abstract class Message{
         }   
     }
     
-    //receive ack method 
-    synchronized public void recvACK(JSONObject msgAck, String addr, int port){
-        
-        String ackId = msgAck.getString("id");                    
-        JSONObject msg = findMessage(ackId);
-
-        //if ids match, set msg ACK to true
-        //this enables sender to remove msg from queue
-        if (msg != null && msg.getString("id").equals(ackId)){
-            msg.put("ack", true);
-        }
-        else{
-            printDebug(msgAck + " not found");
-        }        
-    }
+    //receive abstract ack method 
+    abstract void recvACK(JSONObject msgAck, String addr, int port);
 
     //receive message (abstract for server + client overload)
     abstract void recvMsg(JSONObject msg, String addr, int port);
@@ -162,7 +151,7 @@ public abstract class Message{
 
     //user lookup w/ string
     public JSONObject findUser(String name){
-        JSONObject user = clientTable.optJSONObject(name);
+        JSONObject user = clientTable.optJSONObject(name.toLowerCase());
 
         return user;
     }
@@ -207,11 +196,14 @@ public abstract class Message{
                                 //if ACK added to msg object, sending
                                 //was successful and can exit inner while loop
                                 if (message.optBoolean("ack",false)){
+                                    if(message.optString("type").equals("dereg")){
+                                        printMessage("Deregistration complete");
+                                    }
                                     break;    
                                 }
                                 //alert user that system is attempting resend
                                 else { 
-                                    printMessage("Resending");
+                                    printDebug("Resending");
                                 }
                                 count++;
                             }
@@ -219,8 +211,6 @@ public abstract class Message{
                             messageQueue.remove(0);
                             //if msg failed to send, alert user
                             if (count == 5){
-                                printMessage("No ACK received after " +
-                                             "timeout and 5 retries");
                                 sendFail(message, addr, p);
                             }
                         }
@@ -266,7 +256,19 @@ public abstract class Message{
                         //if system receives ACK, checks to see if unique 
                         //ids are the same on ACK and message 
                         if (message.getString("type").equals("ack")){
-                            recvACK(message, addr, p);
+
+                            String ackId = message.getString("id");                    
+                            JSONObject msg = findMessage(ackId);
+
+                            //if ids match, set msg ACK to true
+                            //this enables sender to remove msg from queue
+                            if (msg != null && msg.getString("id").equals(ackId)){
+                                msg.put("ack", true);
+                                recvACK(msg, addr, p);
+                            }
+                            else{
+                                printDebug(message + " not found");
+                            }  
                         }
                         else{
                             //call send ACK with msg, addr, and port 
@@ -297,6 +299,8 @@ public abstract class Message{
     }
     //print debug messages
     public static void printDebug(String s){
-        //printMessage("Debug: " + s);
+        if (debug){
+            printMessage("Debug: " + s);
+        }
     }
 }

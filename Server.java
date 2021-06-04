@@ -79,11 +79,12 @@ public class Server extends Message{
                 //broadcasting updated table to all online users
                 updateClients(name, true);
                 //check for offline messages
-                userMsgs = offlineMsgs.optJSONArray(name);
+                userMsgs = offlineMsgs.optJSONArray(name.toLowerCase());
 
                 if (userMsgs!=null){
                     JSONObject greeting = new JSONObject();
                     greeting.put("text", "Welcome back! You got mail.");
+                    greeting.put("from", "Chat Server");
                     sendMessage(greeting, addr, port, "chat");
                     for (int i = 0; i < userMsgs.length(); i++){
                         JSONObject oldMsg = userMsgs.getJSONObject(i);
@@ -93,7 +94,6 @@ public class Server extends Message{
                 }
 
                 break;
-
             case "dereg":
                 name = msg.getString("name");
                 JSONObject client = clientTable.getJSONObject(name.toLowerCase());
@@ -107,6 +107,9 @@ public class Server extends Message{
                 printError("Unknown message received");
         }
     }
+    
+    public void recvACK(JSONObject msgAck, String addr, int port){}
+
 
     private void updateClients(String name, Boolean online){
         //users are case-agnostic (see recvMessg)

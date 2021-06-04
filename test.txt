@@ -18,13 +18,14 @@ Things to address:
     6. When user logs out, other user gets incorrect message that they are actually online....
         -Repo: log in, send message to other client, dereg, other client gets false message
         -Also occurs when user quits. 
-    7. User sees that they logged in even though they shouldn't get that message
+    7. User sees that they logged in even though they shouldn't get that message (fixed)
+    8. Command prompt not always showing or shows double
 
 
 Messages to send: 
--when local table is updated let client know with this message: [Client table updated.]
--Must confirm if a message is received by the recipient with: [Message received by <receiver nickname>.]
--If message sent to server, must confirm with client: [No ACK from <receiver nickname>, message sent to server.
--During dereg, if the server does not respond after retries + timeout, the following should be printed: [Server not responding] + [Exiting]
--Confirm when offline chat is saved by server: [Messages received by the server and saved]
--If a user logs in and has offline messages, must be sent: [You have messages]
+-when local table is updated let client know with this message: [Client table updated.] DONE
+-Must confirm if a message is received by the recipient with: [Message received by <receiver nickname>.] 
+-If message sent to server, must confirm with client: [No ACK from <receiver nickname>, message sent to server. IGNORE
+-During dereg, if the server does not respond after retries + timeout, the following should be printed: [Server not responding] + [Exiting] DONE
+-Confirm when offline chat is saved by server: [Messages received by the server and saved] DONE
+-If a user logs in and has offline messages, must be sent: [You have messages] DONE

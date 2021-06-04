@@ -3,7 +3,8 @@ Command Line prompts:
 Connecting to vm (external ip may change): 
 ssh -i  ~/.ssh/id_rsa andreasfreund@35.245.199.86 
 ssh -i  ~/.ssh/id_rsa andreasfreund@35.199.16.29
-
+to switch to root: 
+>>> su
 
 $ UdpChat <mode> <command-line arguments> : 
 Start the program for server or client, 
@@ -13,18 +14,13 @@ The client mode should take four arguments: the client’s nick-name,
 the server ip address, the server’s listening port number, and this 
 client’s port number for listening.
 
-java UdpChat.java -s 3000 -c dre localhost 3000 3000
-
-Dynamic arrays 
-hash map implementation
-json/hashmap parsers 
-file
 
 
 NAT + protocol discussion in readme
 
 
 TESTING GIT
+Git token: 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
 
 git config --global --edit (for getting rid of username stuff)
 
@@ -34,15 +30,5 @@ git commit -m "message"
 
 git push
 
-to swithc to root: 
->>> su
 
-Next steps: 
-    1. multiworded chat 
-    2. clean up naming conventions/debug code/commented code 
-    3. readme [NAT, sendThread, commandline]
-    4. Testfile 
-    5. makefile 
-    6. add in success messages 
-    7. Put on VM 
-    8. test with multiple clients
+

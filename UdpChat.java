@@ -25,7 +25,7 @@ public class UdpChat {
         argParse(args, "");
         Scanner input = new Scanner(System.in);
         
-        while (running){
+        while (running && !Message.stopApp){
 
             //allows for continous message sending
             System.out.print(">>> ");
@@ -38,13 +38,12 @@ public class UdpChat {
         input.close();
 
         //clean server + client shut down
-        System.out.println("Shutting down");
         if (client != null){
-            client.stop();
+            client.stopMessages();
         }
 
         if (server !=null){
-            server.stop();
+            server.stopMessages();
         }      
     }
 
@@ -67,7 +66,7 @@ public class UdpChat {
                         }
                         //**what does this handle exactly?**
                         if (client != null){
-                            client.stop();
+                            client.stopMessages();
                         }
 
                         //client constructor variables from args    
@@ -89,7 +88,7 @@ public class UdpChat {
                             return;   
                         }
                         if (server != null){
-                            server.stop();
+                            server.stopMessages();
                         }
                         //creates new server
                         server = new Server(Integer.parseInt(args[++pos]));
@@ -145,6 +144,7 @@ public class UdpChat {
                         }
                         //otherwise, send message to server for offline chat
                         else{
+                            msgChat.put("viaserver", true);
                             client.sendMessage(msgChat, client.sAddr,
                                                 client.sPort, "chat");
                         }
@@ -160,7 +160,7 @@ public class UdpChat {
                         }
                         //again not sure what this does
                         if (client != null){
-                            client.stop();
+                            client.stopMessages();
                         }
                         //creates new client w/ constructor
                         client = new Client(clientName, serverAddr, 
@@ -170,16 +170,25 @@ public class UdpChat {
                      //deregister case
                      case "dereg":
                         if (client!=null){
-                            client.stop();
+                            client.stopMessages();
                             Message.printMessage("You are Offline. Bye.");
                             //sets client to null to avoid issues w/ offline send etc.
                             client = null;
                         }
                         break;    
                     //quit commandline case
-                    case "quit":
+                    case "-debug":
+                        Message.debug = !Message.debug;
+                        Message.printMessage("Debug " + (Message.debug?"on":"off"));
+                        break;
+                    case "-quit":
                     case "-q":
                         running = false;
+                        break;
+                    case "-qs":
+                        if (server !=null){
+                            server.stopMessages();
+                        }
                         break;
                     //empty line case
                     case "":

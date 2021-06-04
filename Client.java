@@ -61,15 +61,29 @@ public class Client extends Message{
                 String text = msg.optString("text");
                 String date = msg.optString("date");
 
-                printMessage(date + " " + from + ": " + text);
+                printMessage(date + "- " + from + ": " + text);
                 break;
             //handles registration errors (ie duplicate user name)
             case "regerror":
                 printMessage(msg.optString("text"));
-                super.stop();
+                super.stopMessages();
                 break;
             default:
                 printError("Unknown message received");
+        }
+    }
+
+    public void recvACK(JSONObject msg, String addr, int port){
+        String type = msg.optString("type");
+        String name = msg.optString("name");
+
+        if (type.equals("chat")){
+            if (msg.optBoolean("viaserver")){
+                printMessage("Message received and saved by server");       
+            }
+            else {
+                printMessage("Message received by " + name);
+            }
         }
     }
 
@@ -78,24 +92,34 @@ public class Client extends Message{
 
         JSONObject user = findUser(msg);
 
-        if (user!=null && msg.optString("type").equals("chat")){
-            user.put("online", false);
-            //checks to see if message was originally sent to server
-            if (msg.getString("addr").equals(sAddr) && msg.getInt("port") == sPort){
-                return;
+        if (user!=null){
+
+            if (msg.optString("type").equals("chat")){
+                user.put("online", false);
+                printMessage("No ACK received after " + "timeout and 5 retries");
+            
+                //checks to see if message was originally sent to server
+                if (msg.getString("addr").equals(sAddr) && msg.getInt("port") == sPort){
+                    return;
+                }
+                //resends message to server if msg was not originally sent to server 
+                //for offline handling
+                sendMessage(msg, sAddr, sPort, "chat");
             }
-            //resends message to server if msg was not originally sent to server 
-            //for offline handling
-            sendMessage(msg, sAddr, sPort, "chat");
+            else if (msg.optString("type").equals("dereg")){
+                printMessage("Server not responding");
+                printMessage("Exiting");
+                stopApp = true;
+            }   
         }
     }
 
     //stop method for client
-    public void stop(){
+    public void stopMessages(){
         JSONObject msgDereg = new JSONObject();
         msgDereg.put("name", uName);
         sendMessage(msgDereg, sAddr, sPort, "dereg");
-        printMessage(uName + " deregistered");
-        super.stop();
+        printMessage("Attempting deregistration for " + uName);
+        super.stopMessages();
     }
 }
