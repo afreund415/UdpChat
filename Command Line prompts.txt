@@ -14,6 +14,7 @@ The client mode should take four arguments: the client’s nick-name,
 the server ip address, the server’s listening port number, and this 
 client’s port number for listening.
 
+Update 
 
 
 NAT + protocol discussion in readme
