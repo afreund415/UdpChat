@@ -26,7 +26,6 @@ public class Client extends Message{
         JSONObject msgReg = new JSONObject();
         msgReg.put("name", uName);
         sendMessage(msgReg, sAddr, sPort, "reg");
-        printMessage("Welcome " + uName + "! You are registered");
     }
 
     public void recvMsg(JSONObject msg, String addr, int port){
@@ -75,15 +74,18 @@ public class Client extends Message{
 
     public void recvACK(JSONObject msg, String addr, int port){
         String type = msg.optString("type");
-        String name = msg.optString("name");
+        String recipient = msg.optString("name");
 
         if (type.equals("chat")){
             if (msg.optBoolean("viaserver")){
                 printMessage("Message received and saved by server");       
             }
             else {
-                printMessage("Message received by " + name);
+                printMessage("Message received by " + recipient);
             }
+        }
+        else if (type.equals("reg")){
+            printMessage("Welcome " + uName + "! You are registered");
         }
     }
 

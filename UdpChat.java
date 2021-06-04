@@ -21,6 +21,17 @@ public class UdpChat {
     static int serverPort = 3001;  
     static String serverAddr = null;
 
+    public static String validateName(String name) throws Exception {
+        name = name.trim();
+        if ((name != null) && !name.isEmpty() && 
+            name.length() < 20 && 
+            name.charAt(0) >= 'A' &&
+            name.matches("^[a-zA-Z0-9]*$")) {
+            return name;
+        }
+        throw new Exception("Name can only contain alphanumeric characters");
+    }
+
     public static void main(String[] args) {
         argParse(args, "");
         Scanner input = new Scanner(System.in);
@@ -70,7 +81,7 @@ public class UdpChat {
                         }
 
                         //client constructor variables from args    
-                        clientName = args[++pos];
+                        clientName = validateName(args[++pos]);
                         serverAddr = args[++pos];
                         serverPort = Integer.parseInt(args[++pos]);
                         clientPort = Integer.parseInt(args[++pos]);
@@ -109,7 +120,7 @@ public class UdpChat {
                         }
                         //creating message variables
                         //name is the recipient name
-                        String name = args[++pos].toLowerCase();
+                        String name = validateName(args[++pos].toLowerCase());
                         String chatLine;
                         //looks up recipient
                         JSONObject recipient = client.findUser(name);
@@ -152,7 +163,7 @@ public class UdpChat {
                     //register case
                     case "reg":
                         if (args.length - pos >= 2){
-                            clientName = args[++pos];
+                            clientName = validateName(args[++pos]);
                         }
                         if (serverAddr == null){
                             Message.printError("Server never specified");
@@ -188,6 +199,7 @@ public class UdpChat {
                     case "-qs":
                         if (server !=null){
                             server.stopMessages();
+                            server = null;
                         }
                         break;
                     //empty line case

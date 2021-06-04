@@ -1,6 +1,6 @@
 
-JFLAGS = -cp "./json-20201115.jar:./"
-JCFLAGS = -g -cp "./json-20201115.jar:./"
+JFLAGS = -cp "./json.jar:./"
+JCFLAGS = -g -cp "./json.jar:./"
 JC = javac
 
 .SUFFIXES: .java .class
@@ -14,12 +14,17 @@ CLASSES = \
  Client.java \
  Message.java 
 
-default: classes
+default: classes jar
 
 classes: $(CLASSES:.java=.class)
 
+jar: $(classes)
+	jar cfvem UdpChat.jar UdpChat UdpChat.mf -C ./ *.class 
+
+
 clean:
-	$(RM) *.class
+	$(RM) *.class UdpChat.jar
 
 run:
 	java $(JFLAGS) UdpChat
+	
