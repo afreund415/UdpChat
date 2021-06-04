@@ -1,11 +1,18 @@
 
+/* 
+Andreas Carlos Freund
+Acf2175
+CSEE-4119 Computer Networks
+Programming Assignment #1
+*/
+
 import java.net.*;
 import java.text.SimpleDateFormat;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
+//import java.util.concurrent.TimeoutException;
 
 
 public abstract class Message{
@@ -17,13 +24,14 @@ public abstract class Message{
     boolean running = true;
     DatagramSocket ds;
     JSONArray messageQueue = new JSONArray();
-    //**remove tag eventually */
+    //tag for debugging threads
     String tag;
     JSONObject clientTable = new JSONObject(); 
     
 
     //constructor method for classes 
     public Message(int port, String tag) throws Exception{
+        
         this.port = port;
         //**tag for debugging thread handling*
         this.tag = tag;
@@ -33,16 +41,15 @@ public abstract class Message{
         ds = new DatagramSocket(port);
         //allows receive thread to breath
         ds.setSoTimeout(500);
-
         //starting threads
         receive.start();
         send.start();
     }
 
     //stop thread helper method
-    //makes sure to allow send & receive threads to finish
     public void stop(){
         running = false;
+        //makes sure to allow send & receive threads to finish
         while(send.isAlive() && receive.isAlive()){
             sleepMs(100);
         }
@@ -62,7 +69,7 @@ public abstract class Message{
         }
     }
 
-    //maybe delete
+    //method for locating messages in message queue if needed
     synchronized public JSONObject findMessage(String id){
         JSONObject msg = null; 
 
@@ -71,39 +78,35 @@ public abstract class Message{
             if (msg != null && msg.getString("id").equals(id)){
                 return msg;
             }
-        }
-        
+        } 
         return null;
     }
 
-    //message creator method that adds messages to JSON queue 
-    synchronized public void sendMessage(JSONObject m, String addr, int port, String type){
-     
+    //message creator method that adds messages to JSON message queue 
+    synchronized public void sendMessage(JSONObject msg, String addr, int port,
+                                        String type){
         //unique ID for ensuring correct sending of messages
         String id = UUID.randomUUID().toString();
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
         //adding necessary fields to message obj
-        m.put("id", id);
-        m.put("addr", addr);
-        m.put("port", port);
-        m.put("type", type);
-        m.put("date", formatter.format(date));
+        msg.put("id", id);
+        msg.put("addr", addr);
+        msg.put("port", port);
+        msg.put("type", type);
+        msg.put("date", formatter.format(date));
 
         //add message to queue
-        messageQueue.put(m);
+        messageQueue.put(msg);
     }
 
-    //ACK method for ensuring successful delivery
-    synchronized public void sendACK(JSONObject m, String addr, int port){
+    //ACK method for ensuring successful delivery of messages
+    synchronized public void sendACK(JSONObject msg, String addr, int port){
         
         try{
-            InetAddress ip; 
-
-            //**ensuring ACKs are not sent in response to other ACKs    
-            //may not be necessary since we check in receive thread*
-            if (m.getString("type").equals("ack")){
+            //ensuring ACKs are not sent in response to other ACKs
+            if (msg.getString("type").equals("ack")){
                 return;
             }
             //creat ACK obj
@@ -113,21 +116,21 @@ public abstract class Message{
             ack.put("port", port);
             ack.put("type", "ack");
             //creating string from unique ID 
-            String id = m.getString("id");
+            String id = msg.getString("id");
             ack.put("id", id);
 
             //setting destination address + port #
+            InetAddress ip; 
             ip = InetAddress.getByName(ack.getString("addr"));
             int p = ack.getInt("port");
 
-            //encapculating ACK msg as string
+            //Creating string from ACK msg
             String str = ack.toString();
            
-            //creating packet 
+            //creating UDP packet 
             DatagramPacket dp = new DatagramPacket(str.getBytes(), 
                                     str.length(), ip, p);
             //send ACK (no delay)
-            //**SHOULD I MAKE MULTIPLE ATTEMPTS?*
             ds.send(dp);
         }
         catch(Exception e){
@@ -135,13 +138,13 @@ public abstract class Message{
         }   
     }
     
+    //receive ack method 
     synchronized public void recvACK(JSONObject msgAck, String addr, int port){
         
-        String ackId = msgAck.getString("id");
-                            
+        String ackId = msgAck.getString("id");                    
         JSONObject msg = findMessage(ackId);
 
-        //if ids match, sent msg type ACK to true
+        //if ids match, set msg ACK to true
         //this enables sender to remove msg from queue
         if (msg != null && msg.getString("id").equals(ackId)){
             msg.put("ack", true);
@@ -154,7 +157,7 @@ public abstract class Message{
     //receive message (abstract for server + client overload)
     abstract void recvMsg(JSONObject msg, String addr, int port);
     
-    //send chat fail message (abstract)
+    //send chat fail message (abstract for server + client overload)
     abstract void sendFail(JSONObject msg, String addr, int port);
 
     //user lookup w/ string
@@ -168,7 +171,6 @@ public abstract class Message{
         String name = msg.optString("name");
 
         return findUser(name);
-
     }
 
     //send thread 
@@ -192,7 +194,7 @@ public abstract class Message{
                             String addr = message.getString("addr");
                             ip = InetAddress.getByName(addr);
                             int p = message.getInt("port");
-                            //creating packet
+                            //creating UDP packet
                             DatagramPacket dp = new DatagramPacket(
                                                     str.getBytes(), 
                                                     str.length(), ip, p);
@@ -209,7 +211,7 @@ public abstract class Message{
                                 }
                                 //alert user that system is attempting resend
                                 else { 
-                                    printMessage("resending");
+                                    printMessage("Resending");
                                 }
                                 count++;
                             }
@@ -218,34 +220,31 @@ public abstract class Message{
                             //if msg failed to send, alert user
                             if (count == 5){
                                 printMessage("No ACK received after " +
-                                                    "timeout and 5 retries");
+                                             "timeout and 5 retries");
                                 sendFail(message, addr, p);
                             }
                         }
                     }
                 }
-                
                 catch(Exception e){
                     printError(e.getMessage());
                 }
-                //10ms timeout to wait for receiver thread*
+                //10ms timeout to wait for receiver thread
                 sleepMs(10);
-
             }
             //debug statement
             printDebug("Send Thread stopped " + tag);
-
         } 
     }
 
-    //Receive thread
 
+    //Receive thread
     class Receive extends Thread{
 
         public void run(){
             //**debug statement*
             printDebug("Receive Thread started " + tag);
-            //set max # of bytes receiver can receive (max)
+            //set max # of bytes receiver can receive
             byte[] buf = new byte[1024]; 
             
             while(running || send.isAlive()){
@@ -253,17 +252,15 @@ public abstract class Message{
                     //create new empty packet and open socket for receiving
                     DatagramPacket dp = new DatagramPacket(buf, buf.length);  
                     ds.receive(dp); 
-                    if (dp.getLength() > 0){
-                    
+                    if (dp.getLength() > 0){           
                         //set address and port 
                         String addr = dp.getAddress().getHostAddress();
                         int p = dp.getPort();
-                        
                         //create string and JSON obj from received message
                         String str = new String(dp.getData(), 0, dp.getLength());  
                         JSONObject message = new JSONObject(str);
 
-                        //**prints out msg...debug should be removed *
+                        //debug print entire message obj
                         printDebug(tag + ": " + str);  
                         
                         //if system receives ACK, checks to see if unique 
@@ -289,17 +286,17 @@ public abstract class Message{
         } 
     }
 
-
+    //prints messages
     public static void printMessage(String s){
         System.out.println(s);
         System.out.print(">>> ");
     }
-
+    //prints error messages
     public static void printError(String s){
         printMessage("Error " + s);
     }
-
+    //print debug messages
     public static void printDebug(String s){
-        //printMessage("Log: " + s);
+        //printMessage("Debug: " + s);
     }
 }

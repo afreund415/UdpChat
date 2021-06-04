@@ -1,19 +1,3 @@
-A details:
--Users cannot have same user name
--
-
-
-Messages: 
-
-
-Clarification: 
-1. Dereg (why does it require a nickname/user name when the cleint already knows own name)
-2. Ack for dereg is weird. 
-
-
-KNown issues: 
-send Andreas hello 
-
 
 
 Plan 6/3
@@ -26,9 +10,21 @@ Plan 6/3
 
 
 Things to address: 
-    1. Let user know more clearly which users are online (ie return the list of online users)
-    2. dreas typo when having multiple clients talking to each other
-    3. check username duplicates
-    4. send table more cleanly 
-    5. Error Socket closed on dereg 
-     
+    1. Let user know more clearly which users are online (ie return the list of online users) (fixed)
+    2. dreas typo when having multiple clients talking to each other (fixed)
+    3. check username duplicates (fixed)
+    4. send table more cleanly (sort of fixed)
+    5. Error Socket closed on dereg (fixed)
+    6. When user logs out, other user gets incorrect message that they are actually online....
+        -Repo: log in, send message to other client, dereg, other client gets false message
+        -Also occurs when user quits. 
+    7. User sees that they logged in even though they shouldn't get that message
+
+
+Messages to send: 
+-when local table is updated let client know with this message: [Client table updated.]
+-Must confirm if a message is received by the recipient with: [Message received by <receiver nickname>.]
+-If message sent to server, must confirm with client: [No ACK from <receiver nickname>, message sent to server.
+-During dereg, if the server does not respond after retries + timeout, the following should be printed: [Server not responding] + [Exiting]
+-Confirm when offline chat is saved by server: [Messages received by the server and saved]
+-If a user logs in and has offline messages, must be sent: [You have messages]

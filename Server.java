@@ -1,3 +1,11 @@
+
+/* 
+Andreas Carlos Freund
+Acf2175
+CSEE-4119 Computer Networks
+Programming Assignment #1
+*/
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -7,27 +15,28 @@ public class Server extends Message{
     JSONArray table = new JSONArray(); 
     JSONObject offlineMsgs = new JSONObject();
 
-    //UdpChat -s <port>
+    //constructor method
     public Server(int port) throws Exception{
-        super(port, "server"); 
-        
+        super(port, "server");   
     }
-    //update table could fail, forwarding message could fail 
-    //currently logs out any user that receives failed message
+    
+    //server send fail method that invokes offline chat
     public void sendFail(JSONObject msg, String addr, int port){
 
         JSONObject user = findUser(msg);
 
         if (user!=null){
+            String name = msg.optString("name"); 
             user.put("online", false);
             //assumes user has registered
             if (msg.optString("type").equals("chat")){
                 storeChatOffline(msg);
             }
-            updateClients();
+            updateClients(name, false);
         }
     }
 
+    //stores chat messages sent to offline users
     public void storeChatOffline(JSONObject msg){
         String name;
         JSONArray userMsgs;
@@ -42,42 +51,40 @@ public class Server extends Message{
     }
 
 
-    //msg = message, addr = return addr, port = return port
+    //server receive message method, switches based on msg type
     public void recvMsg(JSONObject msg, String addr, int port){
         String type = msg.getString("type");
         String name;
-
         JSONArray userMsgs;
-
 
         switch(type){
             case "reg":
-                name = msg.getString("name").toLowerCase(); 
-                JSONObject user = findUser(name);
-
+                //creates case-agnostic key for clientTable
+                name = msg.getString("name"); 
+                JSONObject user = findUser(name.toLowerCase());
+                //checks if user name is taken or not
                 if (user != null && user.optBoolean("online")){
                     JSONObject msgRegError = new JSONObject();
                     msgRegError.put("text", name + " username is taken");
-                   
                     sendMessage(msgRegError, addr, port, "regerror");
+
                     return;
                 }
                 //adds addr, port, and online status to msg
                 msg.put("addr", addr);
                 msg.put("port", port);
                 msg.put("online", true);
-                //creates case-agnostic key for clientTable
-                
                 //adds key(by name) to table and contact info
-                clientTable.put(name, msg); 
-                //helper method for broadcasting updated table 
-                //to all online users
-                updateClients();
-
+                clientTable.put(name.toLowerCase(), msg); 
+                //broadcasting updated table to all online users
+                updateClients(name, true);
                 //check for offline messages
                 userMsgs = offlineMsgs.optJSONArray(name);
 
                 if (userMsgs!=null){
+                    JSONObject greeting = new JSONObject();
+                    greeting.put("text", "Welcome back! You got mail.");
+                    sendMessage(greeting, addr, port, "chat");
                     for (int i = 0; i < userMsgs.length(); i++){
                         JSONObject oldMsg = userMsgs.getJSONObject(i);
                         sendMessage(oldMsg, addr, port, "chat");
@@ -88,10 +95,10 @@ public class Server extends Message{
                 break;
 
             case "dereg":
-                name = msg.getString("name").toLowerCase();
-                JSONObject client = clientTable.getJSONObject(name);
+                name = msg.getString("name");
+                JSONObject client = clientTable.getJSONObject(name.toLowerCase());
                 client.put("online", false);
-                updateClients();
+                updateClients(name, false);
                 break;
             case "chat":
                 storeChatOffline(msg);
@@ -101,20 +108,20 @@ public class Server extends Message{
         }
     }
 
-    private void updateClients(){
+    private void updateClients(String name, Boolean online){
         //users are case-agnostic (see recvMessg)
         JSONArray users = clientTable.names();
-       
 
         //loop for sending updated table to online users
         for (int i = 0; i < users.length(); i++){
             JSONObject msgTable = new JSONObject();
             //adds reference to clientTable to msgTables
             msgTable.put("table", clientTable); 
+            msgTable.put("name", name);
+            msgTable.put("online", online);
             String user = users.getString(i);
             JSONObject dest = clientTable.getJSONObject(user);
-            
-            
+                
             if(dest.optBoolean("online")){
                 //sends updated table to each online user    
                 printDebug("updateClients " + user + " " + dest.toString());

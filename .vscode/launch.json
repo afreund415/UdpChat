@@ -16,7 +16,7 @@
             "request": "launch",
             "mainClass": "UdpChat",
             "projectName": "UdpChat_cfb3bf42",
-            "args": "-s 3000 -c dre 127.0.0.1 3000 3001"
+            "args": "-s 3000 -c Dre 127.0.0.1 3000 3001"
             //-c Andreas 127.0.0.1 3000 3002
         },
         {
