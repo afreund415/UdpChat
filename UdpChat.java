@@ -20,6 +20,8 @@ public class UdpChat {
     static String clientName = "Unknown";
     static int serverPort = 3001;  
     static String serverAddr = null;
+    static Scanner input = new Scanner(System.in);
+
 
     public static String validateName(String name) throws Exception {
         name = name.trim();
@@ -32,9 +34,15 @@ public class UdpChat {
         throw new Exception("Name can only contain alphanumeric characters");
     }
 
+    //shut down for scanner-blocked exit
+    public static void shutdown(){
+        running = false;
+        System.exit(0);
+        
+    }
+
     public static void main(String[] args) {
         argParse(args, "");
-        Scanner input = new Scanner(System.in);
         
         while (running && !Message.stopApp){
 
@@ -46,8 +54,7 @@ public class UdpChat {
             argParse(newArgs, line);
             
         }
-        input.close();
-
+        
         //clean server + client shut down
         if (client != null){
             client.stopMessages();
@@ -200,6 +207,7 @@ public class UdpChat {
                         if (server !=null){
                             server.stopMessages();
                             server = null;
+                            Message.printDebug("Server stopped");
                         }
                         break;
                     //empty line case

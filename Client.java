@@ -60,7 +60,7 @@ public class Client extends Message{
                 String text = msg.optString("text");
                 String date = msg.optString("date");
 
-                printMessage(date + "- " + from + ": " + text);
+                printMessage(date + " - " + from + ": " + text);
                 break;
             //handles registration errors (ie duplicate user name)
             case "regerror":
@@ -98,10 +98,14 @@ public class Client extends Message{
 
             if (msg.optString("type").equals("chat")){
                 user.put("online", false);
-                printMessage("No ACK received after " + "timeout and 5 retries");
+                printMessage("No ACK received after timeout and 5 retries");
             
                 //checks to see if message was originally sent to server
                 if (msg.getString("addr").equals(sAddr) && msg.getInt("port") == sPort){
+                    printMessage("Server not responding");
+                    printMessage("Exiting");
+                    stopApp = true;
+                    UdpChat.shutdown();
                     return;
                 }
                 //resends message to server if msg was not originally sent to server 

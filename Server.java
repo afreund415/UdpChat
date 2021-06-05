@@ -90,7 +90,7 @@ public class Server extends Message{
                         JSONObject oldMsg = userMsgs.getJSONObject(i);
                         sendMessage(oldMsg, addr, port, "chat");
                     }
-                    offlineMsgs.remove(name);
+                    offlineMsgs.remove(name.toLowerCase());
                 }
 
                 break;
