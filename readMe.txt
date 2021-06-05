@@ -31,12 +31,20 @@ CommandLine options:
     -debug (toggles debug messages off and on in the code for testing)
 
 Architecture: 
-    -Classes that are implemented and what each one is doing 
+    -My project utilizes 4 main classs. UdpChat, Message, Client and Server. The UdpChat class compiles the entire project and handles command line arguments. The Message class handles sending and receiving of messages and is where all the UDP socket handling lives. The Server and Client classes extend the message class, construct Server and Clients, and handle their specific implementations of the Message class. The Message class utilizes multithreading for Receiving and Sending, and all messages are in JSON format. 
 
-    Each client and server has receive and send thread that picks up message from message queue 
+    UdpChat:
+    The UdpChat class contains the project's Main function and handles all command line arguments. The class also has a method called argParse that uses Switch case statements to handle the different commands, such as constructing new Clients and starting the Server, sending a message, and exiting the program. It also contains a debug toggle command to assist with debugging the project. The class also has a validateName helper method for ensuring usernames only utilize alphanumeric characters.   
 
-    -Message class handles all message handling and Server and Client classes extend it for added functionality and interpretation. 
-    -Mention NAT...both send and receive use same local port in order to allow clients to run behind NAT on private addresses. I tested this. The server saves the port and address for each client from the incoming registration message to account for NAT port translation
+    Message class: 
+    The message class uses multithreading for sending and receiving all messages, which are all in JSON format. Both the Send and Receive threads use the same local port in order to allow clients to run behind NAT on private addresses. The server saves the port and address from each client from incoming registration message to account for NAT port translation (in the server class). The Send and Receive threads handle all the UDP socket implementation (aside from ACK sending). The class also contains a sendMessage method that constructs messages as JSON objects, with a unique ID for ACK verification, a date, IP address, port, and type. This method then places the message in a messageQueue for the receive thread to handle. Additionally, the class has a sendACK method that bypasses the timeouts imposed on the normal Send thread, as well as findUser methods for locating users, and 3 abstract methods for overloading in the extended Server and Client classes. Those methods are recvACK (for ACK handling), recvMsg (for receiving messages), and sendFail (for handling sending failures). The class has a findMessage method for locating messages by unique ID, a stopMessages method for clean shut down of the threads, and a sleepMs method for inducing a timedelay on our threads when needed to ensure synchronization. Lastly, the class has several print methods for printing system messages, errors, and debug statements.      
+
+    Server class: 
+    This class extends the Message class, contains a Server constructor, implementation of the abstract Message class methods sendFail, recvMsg, and recvACK, amongst other methods. The recvMsg is the largest method in the class and handles the various types of messages the server receives and sends. This method handles all client registration and deregistration requests as well as offline chat. The sendFail implementation sets users to offline when a message is not received and invokes the offline chat flow. The storeChatOffline method creates a JSONArray that stores messages (JSONObjects) that are received by an offline user. When a user registers, the server automatically checks if they have offline messages waiting. The server also contains a updateClients method that maintains a clientTable of all clients, their online status, and contact information (port number and IP address). The method broadcasts the updated table to each user whenever a user registers or deregisters. 
+
+    Client class: 
+    The client class extends the Message class, contains a Client constructor, implementation of the abstract Message class methods sendFail, recvMsg, and recvACK, amongst other methods. The recvMsg implementation uses Switch cases to account for the various types of messages Clients will interact with. For table messages, messages that broadcast the updated clientTable that each client maintains a local copy of, alerts users to changes in online status for all users. The chat case simply prints out messages received by the client, and the registration error case prints messages when the server detects an error in registration. The recvACK method deals with the various types of ACKs clients will get and takes appropriate action, for instance when an offline chat is sent and received. The sendfail implementation alerts users to issues in sending attempts and exits in the case of the server going offline prematurely. Lastly, this class has a method for stopping its send and receive threads when the user exits.   
+
 
 
 Message protocol: 
@@ -183,7 +191,7 @@ Tests
     >>> Message received by andreas
     >>> -q
 
-4. 3 way chat with dereg, reg, offline chat, server quitting before user    
+4. 3 way chat with reg, dereg, offline chat, server quitting before user    
    exit + offline chat, self message, reg with duplicate username, normal reg after dereg on client instance
    
    Server: 

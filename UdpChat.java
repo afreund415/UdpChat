@@ -22,25 +22,7 @@ public class UdpChat {
     static String serverAddr = null;
     static Scanner input = new Scanner(System.in);
 
-    //validates user names to avoid weird symbols 
-    public static String validateName(String name) throws Exception {
-        name = name.trim();
-        if ((name != null) && !name.isEmpty() && 
-            name.length() < 20 && 
-            name.charAt(0) >= 'A' &&
-            name.matches("^[a-zA-Z0-9]*$")) {
-            return name;
-        }
-        throw new Exception("Username can only contain alphanumeric characters");
-    }
-
-    //shut down for scanner-blocked exit
-    public static void shutdown(){
-        running = false;
-        System.exit(0);
-        
-    }
-
+    //MAIN 
     public static void main(String[] args) {
         argParse(args, "");
         
@@ -51,8 +33,7 @@ public class UdpChat {
             String line = input.nextLine();
             String[] newArgs = line.split(" ");
 
-            argParse(newArgs, line);
-            
+            argParse(newArgs, line);     
         }
         
         //clean server + client shut down
@@ -82,7 +63,6 @@ public class UdpChat {
                                                 "to create client");
                             return;    
                         }
-                        
                         if (client != null){
                             client.stopMessages();
                             client = null;
@@ -140,7 +120,6 @@ public class UdpChat {
                             Message.printError(name + " does not exist");
                             return;
                         }
-
                         //if passed an empty line, sets chatline to args
                         if (line.isEmpty()){
                             chatLine = args[++pos];
@@ -224,5 +203,23 @@ public class UdpChat {
         catch (Exception e){
             Message.printError(e.getMessage());
         }   
+    }
+    //validates user names to avoid weird symbols 
+    public static String validateName(String name) throws Exception {
+        name = name.trim();
+        if ((name != null) && !name.isEmpty() && 
+            name.length() < 20 && 
+            name.charAt(0) >= 'A' &&
+            name.matches("^[a-zA-Z0-9]*$")) {
+            return name;
+        }
+        throw new Exception("Username can only contain alphanumeric characters");
+    }
+
+    //shut down for scanner-blocked exit case
+    public static void shutdown(){
+        running = false;
+        System.exit(0);
+        
     }
 }

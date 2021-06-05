@@ -34,11 +34,11 @@ public abstract class Message{
     public Message(int port, String tag) throws Exception{
         
         this.port = port;
-        //**tag for debugging thread handling*
+        //tag for debugging thread handling
         this.tag = tag;
         send = new Send();
         receive = new Receive();
-        //shared socket and sending and receiving on same port
+        //shared socket for sending and receiving on same port
         ds = new DatagramSocket(port);
         //allows receive thread to breath
         ds.setSoTimeout(500);
@@ -230,7 +230,7 @@ public abstract class Message{
     class Receive extends Thread{
 
         public void run(){
-            //**debug statement*
+            //debug statement
             printDebug("Receive Thread started " + tag);
             //set max # of bytes receiver can receive
             byte[] buf = new byte[1024]; 

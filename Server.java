@@ -17,7 +17,8 @@ public class Server extends Message{
 
     //constructor method
     public Server(int port) throws Exception{
-        super(port, "server");   
+        super(port, "server");
+        printMessage("The server is running on port " + port );
     }
     
     //server send fail method that invokes offline chat
@@ -28,7 +29,7 @@ public class Server extends Message{
         if (user!=null){
             String name = msg.optString("name"); 
             user.put("online", false);
-            //assumes user has registered
+            
             if (msg.optString("type").equals("chat")){
                 storeChatOffline(msg);
             }
@@ -92,7 +93,6 @@ public class Server extends Message{
                     }
                     offlineMsgs.remove(name.toLowerCase());
                 }
-
                 break;
             case "dereg":
                 name = msg.getString("name");
@@ -108,9 +108,10 @@ public class Server extends Message{
         }
     }
     
+    //abstract implementation
     public void recvACK(JSONObject msgAck, String addr, int port){}
 
-
+    //updates table and broadcasts to clients 
     private void updateClients(String name, Boolean online){
         //users are case-agnostic (see recvMessg)
         JSONArray users = clientTable.names();
