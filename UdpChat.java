@@ -207,7 +207,7 @@ public class UdpChat {
                         if (server !=null){
                             server.stopMessages();
                             server = null;
-                            Message.printDebug("Server stopped");
+                            Message.printMessage("Server stopped");
                         }
                         break;
                     //empty line case

@@ -55,7 +55,6 @@ public abstract class Message{
         while(send.isAlive() && receive.isAlive()){
             sleepMs(100);
         }
-
         try{
             ds.close();
         }
@@ -280,7 +279,7 @@ public abstract class Message{
                 catch(SocketTimeoutException e){
                 }
                 catch(Exception e){
-                    printError(e.getMessage());
+                    printError("receive thread" + e.getMessage());
                 }
             }
             //debug statement
