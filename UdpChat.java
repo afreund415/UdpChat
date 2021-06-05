@@ -22,7 +22,7 @@ public class UdpChat {
     static String serverAddr = null;
     static Scanner input = new Scanner(System.in);
 
-
+    //validates user names to avoid weird symbols 
     public static String validateName(String name) throws Exception {
         name = name.trim();
         if ((name != null) && !name.isEmpty() && 
@@ -31,7 +31,7 @@ public class UdpChat {
             name.matches("^[a-zA-Z0-9]*$")) {
             return name;
         }
-        throw new Exception("Name can only contain alphanumeric characters");
+        throw new Exception("Username can only contain alphanumeric characters");
     }
 
     //shut down for scanner-blocked exit
@@ -82,9 +82,10 @@ public class UdpChat {
                                                 "to create client");
                             return;    
                         }
-                        //**what does this handle exactly?**
+                        
                         if (client != null){
                             client.stopMessages();
+                            client = null;
                         }
 
                         //client constructor variables from args    
@@ -107,6 +108,7 @@ public class UdpChat {
                         }
                         if (server != null){
                             server.stopMessages();
+                            server = null; 
                         }
                         //creates new server
                         server = new Server(Integer.parseInt(args[++pos]));

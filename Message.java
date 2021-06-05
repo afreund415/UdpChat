@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import java.util.Date;
 import java.util.UUID;
-//import java.util.concurrent.TimeoutException;
 
 
 public abstract class Message{

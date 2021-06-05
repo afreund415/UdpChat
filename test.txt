@@ -20,6 +20,7 @@ Things to address:
         -Also occurs when user quits. 
     7. User sees that they logged in even though they shouldn't get that message (fixed)
     8. Command prompt not always showing or shows double
+    9. When attempting to reg with a taken username, it welcomes the new user before telling them they can't register...should solve this in server class 
 
 
 Messages to send: 
@@ -29,3 +30,4 @@ Messages to send:
 -During dereg, if the server does not respond after retries + timeout, the following should be printed: [Server not responding] + [Exiting] DONE
 -Confirm when offline chat is saved by server: [Messages received by the server and saved] DONE
 -If a user logs in and has offline messages, must be sent: [You have messages] DONE
+
