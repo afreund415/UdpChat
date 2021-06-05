@@ -166,6 +166,7 @@ public abstract class Message{
             //debug statement
             printDebug("Send Thread started " + tag);
             InetAddress ip; 
+            String addr = "";
             
             while(running || messageQueue.length() > 0){
                 try{
@@ -177,7 +178,7 @@ public abstract class Message{
                             //**create debug string from JSON Obj msg*
                             String str = message.toString();
                             //getting destination address + port
-                            String addr = message.getString("addr");
+                            addr = message.getString("addr");
                             ip = InetAddress.getByName(addr);
                             int p = message.getInt("port");
                             //creating UDP packet
@@ -212,6 +213,12 @@ public abstract class Message{
                             }
                         }
                     }
+                }
+                catch(UnknownHostException e){
+                    printError("Cannot connect to " + addr);
+                    running = false;
+                    ds.close();
+                    break;
                 }
                 catch(Exception e){
                     printError(e.getMessage());
