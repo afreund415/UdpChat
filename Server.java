@@ -63,14 +63,17 @@ public class Server extends Message{
                 //creates case-agnostic key for clientTable
                 name = msg.getString("name"); 
                 JSONObject user = findUser(name.toLowerCase());
+                JSONObject msgRegResult = new JSONObject();
                 //checks if user name is taken or not
                 if (user != null && user.optBoolean("online")){
-                    JSONObject msgRegError = new JSONObject();
-                    msgRegError.put("text", name + " username is taken");
-                    sendMessage(msgRegError, addr, port, "regerror");
-
+                    msgRegResult.put("success", false);
+                    msgRegResult.put("text", name + " username is taken");
+                    sendMessage(msgRegResult, addr, port, "regresult");
                     return;
                 }
+                msgRegResult.put("success", true);
+                msgRegResult.put("text", name + " is registered");
+                sendMessage(msgRegResult, addr, port, "regresult");
                 //adds addr, port, and online status to msg
                 msg.put("addr", addr);
                 msg.put("port", port);

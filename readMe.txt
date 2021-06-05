@@ -3,6 +3,13 @@ acf2175
 CSEE-4119 Computer Networks
 Programming Assignment #1
 
+Hightlights: 
+    1. Multi-threaded implementation for both send and receive
+    2. Client works behind NAT
+    3. Messages and internal representations are all JSON format
+    4. Server and client can run in the same instance
+    5. All commands are available from the command line or app prompt
+    6. Debug mode
 
 Installing the project
     1. Unzip [filename] into its own directory 
@@ -16,7 +23,9 @@ Running the project:
     3. <java -cp "./:./json.jar" UdpChat> + (commandline args)
     
 CommandLine options: 
-    Note: For local testing, the application can run in both client and server mode at the same time. For example, you can run <-s 3000 -c Andreas 127.0.0.1 3000 3001>. However, the client and server ports must be different. 
+    Note: For local testing, the application can run in both client and server mode at the same time. For example, you can: 
+    run <-s 3000 -c Andreas 127.0.0.1 3000 3001>. 
+    However, the client and server ports must be different. 
     Note: Usernames are case insensitive
 
     -s <port> (Starts/restarts the server)
@@ -31,7 +40,7 @@ CommandLine options:
     -debug (toggles debug messages off and on in the code for testing)
 
 Architecture: 
-    -My project utilizes 4 main classs. UdpChat, Message, Client and Server. The UdpChat class compiles the entire project and handles command line arguments. The Message class handles sending and receiving of messages and is where all the UDP socket handling lives. The Server and Client classes extend the message class, construct Server and Clients, and handle their specific implementations of the Message class. The Message class utilizes multithreading for Receiving and Sending, and all messages are in JSON format. 
+    My project utilizes 4 main classs. UdpChat, Message, Client and Server. The UdpChat class compiles the entire project and handles command line arguments. The Message class handles sending and receiving of messages and is where all the UDP socket handling lives. The Server and Client classes extend the message class, construct Server and Clients, and handle their specific implementations of the Message class. The Message class utilizes multithreading for Receiving and Sending, and all messages are in JSON format. 
 
     UdpChat:
     The UdpChat class contains the project's Main function and handles all command line arguments. The class also has a method called argParse that uses Switch case statements to handle the different commands, such as constructing new Clients and starting the Server, sending a message, and exiting the program. It also contains a debug toggle command to assist with debugging the project. The class also has a validateName helper method for ensuring usernames only utilize alphanumeric characters.   
@@ -46,9 +55,8 @@ Architecture:
     The client class extends the Message class, contains a Client constructor, implementation of the abstract Message class methods sendFail, recvMsg, and recvACK, amongst other methods. The recvMsg implementation uses Switch cases to account for the various types of messages Clients will interact with. For table messages, messages that broadcast the updated clientTable that each client maintains a local copy of, alerts users to changes in online status for all users. The chat case simply prints out messages received by the client, and the registration error case prints messages when the server detects an error in registration. The recvACK method deals with the various types of ACKs clients will get and takes appropriate action, for instance when an offline chat is sent and received. The sendfail implementation alerts users to issues in sending attempts and exits in the case of the server going offline prematurely. Lastly, this class has a method for stopping its send and receive threads when the user exits.   
 
 
-
 Message protocol: 
-    All messages are sent in JSON format. Each message has a unique id for verification and data relability. Each message also has a date and receives an ACK message back with the same unique ID of the original message. The type of message is in the field "type". 
+    All messages are sent in JSON format. Each message has a unique id for verification and data relability. Each message also has a date and receives an ACK message back with the same unique ID of the original message. The type of message is in the field "type". Examples below:
 
 
 Client—>Server
@@ -125,48 +133,6 @@ Client—>Client, Server–> Client, or Client —>Server
   "text": "This project was fun! ",
   "id": "b74c836f-d78d-4f86-8d70-9cb7406932f8"
 }
-
-
-
-1. UdpChat class 
-    -creating server
-    -creating client 
-    -parsing commandline + args 
-    
-2. Server class (exends message class)
-    
-    A. Processing 
-    - Creates and edits JSON table of clients
-    - Registration 
-    - Deregistration 
-    - Offline chat 
-     
-    B. Broadcasting 
-    - Broadcast client table 
-    - Offline message broadcast 
-    - ACKs
-
-
-
-3. Client class (extends message class)
-
-    A. Processing
-    - JSON Client table
-    - Incoming messages 
-    
-    B. Sending
-    - Registration/Deregistration 
-    - Messages 
-
-
-4. Message class (UDP implementation here)
-    A. Send thread
-
-    B. Receive thread 
-
-    C. ACK handling + error handling 
-
-    Note: All messages are JSON objects
 
 
 Tests

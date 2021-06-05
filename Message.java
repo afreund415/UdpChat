@@ -96,7 +96,6 @@ public abstract class Message{
         msg.put("port", port);
         msg.put("type", type);
         msg.put("date", formatter.format(date));
-
         //add message to queue
         messageQueue.put(msg);
     }

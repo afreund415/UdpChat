@@ -63,9 +63,14 @@ public class Client extends Message{
                 printMessage(date + " - " + from + ": " + text);
                 break;
             //handles registration errors (ie duplicate user name)
-            case "regerror":
-                printMessage(msg.optString("text"));
-                super.stopMessages();
+            case "regresult":
+                if (msg.optBoolean("success")){
+                    printMessage("Welcome " + uName + "! You are registered");
+                }
+                else {
+                    printMessage(msg.optString("text"));
+                    super.stopMessages();
+                } 
                 break;
             default:
                 printError("Unknown message received");
@@ -83,9 +88,6 @@ public class Client extends Message{
             else {
                 printMessage("Message received by " + recipient);
             }
-        }
-        else if (type.equals("reg")){
-            printMessage("Welcome " + uName + "! You are registered");
         }
     }
 

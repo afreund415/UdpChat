@@ -24,15 +24,15 @@ public class UdpChat {
 
     //MAIN 
     public static void main(String[] args) {
+        System.out.print(">>> ");
         argParse(args, "");
         
         while (running && !Message.stopApp){
 
             //allows for continous message sending
-            System.out.print(">>> ");
             String line = input.nextLine();
             String[] newArgs = line.split(" ");
-
+            System.out.print(">>> ");
             argParse(newArgs, line);     
         }
         
