@@ -18,7 +18,7 @@ public class Server extends Message{
     //constructor method
     public Server(int port) throws Exception{
         super(port, "server");
-        printMessage("The server is running on port " + port );
+        printMessage("The server is listening on port " + port );
     }
     
     //server send fail method that invokes offline chat
