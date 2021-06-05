@@ -276,10 +276,10 @@ public abstract class Message{
                         }
                     }
                 }
-                catch(SocketTimeoutException e){
-                }
+                catch(SocketTimeoutException e){}
+                catch(SocketException e){}
                 catch(Exception e){
-                    printError("receive thread" + e.getMessage());
+                    printError("receive: " + e.getMessage());
                 }
             }
             //debug statement
